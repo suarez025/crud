@@ -1,5 +1,7 @@
-import datos from "../data/data.json" assert { type: "json" };
+import datosJson from "../data/data.json" assert { type: "json" };
 import { Gift } from "./clases.js";
+
+let datos = JSON.parse(localStorage.getItem("giftData")) || datosJson;
 
 const cuerpoTabla = document.querySelector("#cuerpo-tabla");
 const myModal = new bootstrap.Modal(document.getElementById("modalGift"));
@@ -7,7 +9,6 @@ const myModal = new bootstrap.Modal(document.getElementById("modalGift"));
 let idGiftUpdate = null;
 
 window.mostrarModal = (id) => {
-  console.log(id);
   idGiftUpdate = id;
   let index = datos.findIndex((item) => item.id == idGiftUpdate);
 
@@ -29,6 +30,7 @@ const giftUpdate = (e) => {
   datos[index].precio = document.querySelector("#precioModal").value;
   datos[index].imagen = document.querySelector("#imagenModal").value;
 
+  guardarEnLocalStorage();
   cargarTabla();
   myModal.hide();
 };
@@ -41,7 +43,7 @@ const cargarTabla = () => {
     const celdas = `<th>${item.gift}</th>
         <td>${item.tipo}</td>
         <td>${item.tiempo}</td>
-        <td>${item.precio}</td>
+        <td>$${item.precio}</td>
         <td><img src="${item.imagen}" style = "max-width : 75px; max-height : 75px;"></td>
         <td>
         <div class="d-flex gap-2">
@@ -59,7 +61,7 @@ const cargarTabla = () => {
 const agregarGift = (event) => {
   event.preventDefault();
 
-  let id = datos.at(-1).id + 1;
+  let id = datos.length > 0 ? datos[datos.length - 1].id + 1 : 1;
   let gift = document.querySelector("#gift").value;
   let tipo = document.querySelector("#tipo").value;
   let tiempo = document.querySelector("#tiempo").value;
@@ -67,7 +69,8 @@ const agregarGift = (event) => {
   let imagen = document.querySelector("#imagen").value;
 
   datos.push(new Gift(id, gift, tipo, tiempo, precio, imagen));
-  document.querySelector("#formGift").reset();
+
+
   cargarTabla();
 };
 
@@ -80,8 +83,13 @@ window.borrarGift = (id) => {
 
   if (validar) {
     datos.splice(index, 1);
+    guardarEnLocalStorage();
     cargarTabla();
   }
+};
+
+const guardarEnLocalStorage = () => {
+  localStorage.setItem("giftData", JSON.stringify(datos));
 };
 
 cargarTabla();
