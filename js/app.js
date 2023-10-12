@@ -70,7 +70,8 @@ const agregarGift = (event) => {
 
   datos.push(new Gift(id, gift, tipo, tiempo, precio, imagen));
 
-
+  guardarEnLocalStorage();
+  document.querySelector("#formGift").reset();
   cargarTabla();
 };
 
